@@ -29,4 +29,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 [Yuri Artiukh](https://www.youtube.com/watch?v=sPBb-0al7Y0)
 
-![Loading Page](./public/static/assets/thumbnail/main_page.png)
+![Loading Page](./static/assets/thumbnail/main_page.png)
