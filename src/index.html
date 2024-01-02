@@ -1,14 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shader blob</title>
-    <link rel="stylesheet" href="./style.css" />
-    <link rel="icon" type="image/png" href="/icons/circle.svg" />
-  </head>
-  <body>
-    <canvas class="webgl"></canvas>
-    <script type="module" src="./script.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shader blob</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" type="image/png" href="/assets/icons/circle.svg" />
+</head>
+
+<body>
+  <canvas class="webgl"></canvas>
+  <div class="instructions" id="instructions">
+    <p>Click & Drag to interact !</p>
+  </div>
+  <div class="gravityButton">
+        <button style="--color: gold;" onclick="window.location.href='https://valentinjullien.fr/'">
+          <p class="buttonText">Home</p>
+      </button>
+  </div>
+  <div class="categorie">
+    <a href="https://www.linkedin.com/in/valentin-jullien-78abb1221/">
+      <span class="underline">
+        Valentin JULLIEN
+      </span>
+    </a>
+    Experimentation - WebGL & GLSL
+  </div>
+  <div class="logos">
+    <div style="display: flex;" class="logo">
+      <div class="marge">
+        <a style="display:flex" href="https://twitter.com/VJCreativeDev">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 579.18 470.61" class="size">
+            <title>twitter</title>
+            <g data-name="Layer 2">
+              <path
+                d="M579.18 55.64a237.37 237.37 0 0 1-68.25 18.7 119.3 119.3 0 0 0 52.24-65.73 238.18 238.18 0 0 1-75.45 28.85A119 119 0 0 0 401.07 0c-65.25 0-118.94 53.69-118.94 118.94a119.26 119.26 0 0 0 3.08 26.89A337.49 337.49 0 0 1 40.31 21.68C9 75.67 25.18 145.63 77.1 180.3a117.93 117.93 0 0 1-53.93-14.87v1.51a119.21 119.21 0 0 0 95.33 116.48 118.63 118.63 0 0 1-53.65 2 119.18 119.18 0 0 0 111 82.52A238.53 238.53 0 0 1 28.29 419 243.13 243.13 0 0 1 0 417.24a336.42 336.42 0 0 0 182.14 53.28v.09c218.56 0 338.1-181.07 338.1-338.1 0-5.14 0-10.26-.34-15.36a241.76 241.76 0 0 0 59.28-61.51Z"
+                style="fill:#fff" data-name="Layer 1">
+              </path>
+            </g>
+          </svg>
+        </a>
+      </div>
+      <div class="marge">
+        <a style="display:flex" href="https://github.com/Valentin667/shader-blob">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 607.14 592.19" class="size">
+            <title>github</title>
+            <g data-name="Layer 2">
+              <path d="M303.55 0C135.92 0 0 135.92 0 303.59 0 437.71 87 551.5 207.62 591.66c15.18 
+                2.77 20-6.23 20-14.27 0-7.22.16-27.37 0-52.71-84.43 18.36-101.93-40-101.93-40C111.86 
+                449.63 92 440.29 92 440.29c-27.59-18.83 2-18.47 2-18.47 30.46 2.15 46.51 31.3 46.51 
+                31.3 27.08 46.36 71 33 88.32 25.22 2.77-19.62 10.63-33 19.3-40.59-67.4-7.67-138.27-33.71-138.27-150 
+                0-33.16 11.82-60.24 31.24-81.46-3.13-7.66-13.57-38.54 3-80.35 0 0 25.49-8.16 83.46 31.14a288 
+                288 0 0 1 152 0c58-39.28 83.42-31.14 83.42-31.14 16.55 41.81 6.13 72.69 3 80.35 19.42 
+                21.22 31.2 48.3 31.2 81.46 0 116.63-71 142.29-138.61 149.79 10.89 9.39 20.78 27.61 20.78 55.93v84c0 
+                8.12 4.89 17.1 20.3 14.16 120.55-40.22 207.43-153.95 207.43-288C607.14 135.92 471.22 0 303.55 0Z"
+                style="fill:#fff" data-name="Layer 1">
+              </path>
+            </g>
+          </svg>
+        </a>
+      </div>
+      <div class="marge">
+        <a style="display:flex" href="https://www.linkedin.com/in/valentin-jullien-78abb1221/">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 592.19 592.19" class="size">
+            <title>linkedin</title>
+            <g data-name="Layer 2">
+              <path
+                d="M518.17 0H74A74.06 74.06 0 0 0 0 74v444.17a74.06 74.06 0 0 0 74 74h444.17a74.06 74.06 0 0 0 74-74V74a74.06 74.06 0 0 0-74-74ZM169.81 505H70.62V206.65h99.19Zm-49.6-339.13h-.64c-33.3 0-54.8-22.92-54.8-51.55 0-29.24 22.18-51.56 56.11-51.56s54.81 22.32 55.45 51.56c0 28.68-21.53 51.57-56.12 51.57ZM527.42 505h-99.17V345.38c0-40.1-14.37-67.46-50.24-67.46-27.4 0-43.72 18.45-50.88 36.26-2.63 6.37-3.27 15.29-3.27 24.21V505h-99.17s1.32-270.38 0-298.37h99.17v42.24c13.2-20.32 36.76-49.25 89.38-49.25 65.25 0 114.18 42.63 114.18 134.27Z"
+                style="fill:#fff" data-name="Layer 1">
+              </path>
+            </g>
+          </svg>
+        </a>
+      </div>
+        <a style="display:flex" href="https://valentinjullien.fr/">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 608.19 608.19" class="size">
+            <title>website</title>
+            <g data-name="Layer 2">
+              <path
+                d="M522.38 92.43A302.55 302.55 0 0 0 314.31.26l-.55-.05C312.65.11 311.39 0 310 0c-.67 0-1.24.05-1.66.09H306.77c-.9 0-1.79-.06-2.7-.06a304.09 304.09 0 0 0-215 519.12 302.07 302.07 0 0 0 215 89.07c.91 0 1.8 0 2.7-.06H308.34c.42 0 1 .09 1.66.09 1.37 0 2.63-.11 3.74-.21l.55-.05A304 304 0 0 0 522.38 92.43Zm-91.16 144.93h116.36a252.68 252.68 0 0 1 0 133.42H431.22c1.95-21.81 2.93-44.2 2.93-66.68s-.98-44.92-2.93-66.74Zm-6.64-51.64c-8-47.42-20.48-88.26-36.53-119.75a251.79 251.79 0 0 1 139 119.75Zm-52.26 236.7c-5.17 28.09-12.15 53.32-20.78 75.1-15.67 39.8-32.94 57-40.55 58.86h-1.65c-5.38-1-23-13.51-40.84-58.88-8.56-21.89-15.5-47.12-20.68-75.12Zm-176.87 0c8.32 49.21 21.89 92.38 39 124.36A253.91 253.91 0 0 1 81.09 422.42Zm38.91-360.93c-17 32-30.59 75.08-38.91 124.23H81.23A254.24 254.24 0 0 1 234.36 61.49Zm13.36 124.23c5.17-28.08 12.15-53.28 20.78-75 16.56-42.15 34.35-57.67 40.84-58.9h1.65c7.64 1.84 24.94 19.07 40.54 58.84 8.57 21.84 15.52 47.06 20.69 75.06ZM382.51 304.1c0 22.56-1 45-3.09 66.68H240.67c-2.09-21.81-3.15-44.21-3.15-66.68s1-45 3.1-66.74h138.75c2.08 21.81 3.14 44.22 3.14 66.74Zm144.6 118.32a251.76 251.76 0 0 1-139.06 119.8c16.05-31.5 28.54-72.36 36.54-119.8Zm-338.3-51.64H60.6a251.87 251.87 0 0 1 .07-133.42h128.15c-1.95 21.83-2.94 44.23-2.94 66.74s.99 44.9 2.93 66.68Z"
+                style="fill:#fff" data-name="Layer 1">
+              </path>
+            </g>
+          </svg>
+        </a>
+    </div>
+  </div>
+  <script type="module" src="./script.js"></script>
+</body>
+
 </html>

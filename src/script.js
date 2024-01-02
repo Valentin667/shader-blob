@@ -2,100 +2,67 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
-import vertex from "./shader/vertex.glsl";
-import fragment from "./shader/fragment.glsl";
-import vertex1 from "./shader/vertex1.glsl";
-import fragment1 from "./shader/fragment1.glsl";
+import bigsphereVertexShader from "./shader/bigsphere/vertex.glsl";
+import bigsphereFragmentShader from "./shader/bigsphere/fragment.glsl";
+import littlesphereVertexShader from "./shader/littlesphere/vertex.glsl";
+import littlesphereFragmentShader from "./shader/littlesphere/fragment.glsl";
 import { DotScreenShader } from "./CustomShader";
-// import { DotScreenShader } from "three/addons/shaders/DotScreenShader.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 
 /**
- * Debug
- */
-// const gui = new GUI();
-
-// const settings = () => {
-//   let that = this;
-
-//   this.settings = {
-//     progress: 0,
-//     mRefractionRatio: 1.02,
-//     mFresnelBias: 0.1,
-//     mFresnelScale: 4,
-//     mFresnelPower: 2,
-//   };
-
-//   gui
-//     .add(settings, "mRefractionRatio")
-//     .min(0)
-//     .max(3)
-//     .step(0.01)
-//     .onChange(() => {
-//       littleSphereMesh.uniforms.mRefractionRatio.value =
-//         settings.mRefractionRatio;
-//     });
-//   gui
-//     .add(settings, "mFresnelBias")
-//     .min(0)
-//     .max(3)
-//     .step(0.01)
-//     .onChange(() => {
-//       littleSphereMesh.uniforms.mFresnelBias.value = settings.mFresnelBias;
-//     });
-//   gui
-//     .add(settings, "mFresnelScale")
-//     .min(0)
-//     .max(3)
-//     .step(0.01)
-//     .onChange(() => {
-//       littleSphereMesh.uniforms.mFresnelScale.value = settings.mFresnelScale;
-//     });
-//   gui
-//     .add(settings, "mFresnelPower")
-//     .min(0)
-//     .max(3)
-//     .step(0.01)
-//     .onChange(() => {
-//       littleSphereMesh.uniforms.mFresnelPower.value = settings.mFresnelPower;
-//     });
-// };
-
-// settings();
-// const color1Folder = gui.addFolder("Color 1");
-// color1Folder.addColor(background, "color1").onChange(() => {
-//   // Mettez à jour les couleurs dans le shader ici
-//   bigSphereMaterial.uniforms.color1.value = new THREE.Color().fromArray(
-//     background.color1
-//   );
-// });
-
-// const color2Folder = gui.addFolder("Color 2");
-// color2Folder.addColor(background, "color2").onChange(() => {
-//   // Mettez à jour les couleurs dans le shader ici
-//   bigSphereMaterial.uniforms.color2.value = new THREE.Color().fromArray(
-//     background.color2
-//   );
-// });
-
-// const colorAccentFolder = gui.addFolder("Color Accent");
-// colorAccentFolder.addColor(background, "colorAccent").onChange(() => {
-//   // Mettez à jour les couleurs dans le shader ici
-//   bigSphereMaterial.uniforms.colorAccent.value = new THREE.Color().fromArray(
-//     background.colorAccent
-//   );
-// });
-
-/**
  * Base
  */
+// Debug
+const gui = new GUI({ width: 340 });
+const debugObject = {};
+
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
 
 // Scene
 const scene = new THREE.Scene();
+
+/**
+ * Button
+ */
+document.querySelectorAll('.gravityButton').forEach(btn => {
+  let animationFrameId;
+
+  btn.addEventListener('mousemove', (e) => {
+    cancelAnimationFrame(animationFrameId);
+
+    animationFrameId = requestAnimationFrame(() => {
+      const rect = btn.getBoundingClientRect();    
+      const h = rect.width / 2;
+
+      const x = e.clientX - rect.left - h;
+      const y = e.clientY - rect.top - h;
+
+      const r1 = Math.sqrt(x*x + y*y);
+      const r2 = (1 - (r1 / h)) * r1;
+
+      const angle = Math.atan2(y, x);
+      const tx = Math.round(Math.cos(angle) * r2 * 100) / 100;
+      const ty = Math.round(Math.sin(angle) * r2 * 100) / 100;
+
+      const op = (r2 / r1) + 0.25;
+
+      btn.style.setProperty('--tx', `${tx}px`);
+      btn.style.setProperty('--ty', `${ty}px`);
+      btn.style.setProperty('--opacity', `${op}`);
+    });
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    cancelAnimationFrame(animationFrameId);
+
+    btn.style.setProperty('--tx', '0px');
+    btn.style.setProperty('--ty', '0px');
+    btn.style.setProperty('--opacity', `${0.25}`);
+  });
+});
 
 /**
  * Objects
@@ -109,15 +76,45 @@ const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
 
 const cubeCamera = new THREE.CubeCamera(0.1, 10, cubeRenderTarget);
 
+// Color
+debugObject.firstColor = '#ffffe5';
+debugObject.secondColor = "#e8e178";
+debugObject.accentColor = "#8a7fd2";
+
 // Big Sphere
 const bigSphereMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
   uniforms: {
-    time: { value: 0 },
-    resolution: { value: new THREE.Vector4() },
+    time: {
+      value: 0
+    },
+    effectSpeed: {
+      value: 0.25
+    },
+    uStripes: {
+      value: 0.1
+    },
+    uBasePattern: {
+      value: 0.5
+    },
+    uPatternValue: {
+      value: 0.1
+    },
+    uFirstColor: {
+      value: new THREE.Color(debugObject.firstColor)
+    },
+    uSecondColor: {
+      value: new THREE.Color(debugObject.secondColor)
+    },
+    uAccentColor: {
+      value: new THREE.Color(debugObject.accentColor)
+    },
+    resolution: {
+      value: new THREE.Vector4()
+    },
   },
-  vertexShader: vertex,
-  fragmentShader: fragment,
+  vertexShader: bigsphereVertexShader,
+  fragmentShader: bigsphereFragmentShader,
 });
 
 const bigSphereGeometry = new THREE.SphereGeometry(1.5, 32, 32);
@@ -126,29 +123,134 @@ const bigSphereMesh = new THREE.Mesh(bigSphereGeometry, bigSphereMaterial);
 
 scene.add(bigSphereMesh);
 
+/**
+ * Debug
+ */
+gui
+  .add(bigSphereMaterial.uniforms.effectSpeed, "value")
+  .min(0)
+  .max(3)
+  .step(0.01)
+  .name("Effect Speed")
+
+gui
+  .add(bigSphereMaterial.uniforms.uStripes, "value")
+  .min(0.01)
+  .max(0.5)
+  .step(0.01)
+  .name("Stripes")
+
+gui
+  .add(bigSphereMaterial.uniforms.uBasePattern, "value")
+  .min(0)
+  .max(1)
+  .step(0.01)
+  .name("Base Pattern")
+
+gui
+  .add(bigSphereMaterial.uniforms.uPatternValue, "value")
+  .min(0)
+  .max(1)
+  .step(0.01)
+  .name("Second Pattern")
+
+const background = gui.addFolder('Background');
+background.close()
+
+gui
+background.addColor(debugObject, 'firstColor')
+  .name("First Color")
+  .onChange(() => {
+    bigSphereMaterial.uniforms.uFirstColor.value.set(debugObject.firstColor);
+  });
+
+gui
+background.addColor(debugObject, "secondColor")
+  .name("Second Color")
+  .onChange(() => {
+    bigSphereMaterial.uniforms.uSecondColor.value.set(debugObject.secondColor);
+  });
+
+gui
+background.addColor(debugObject, "accentColor")
+  .name("Accent Color")
+  .onChange(() => {
+    bigSphereMaterial.uniforms.uAccentColor.value.set(debugObject.accentColor);
+  });
+
+/**
+ * Little Sphere
+ */
+// Geometry
+const littleSphereGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+
 // Little Shere
 const littleSphereMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
   uniforms: {
-    time: { value: 0 },
-    tCube: { value: 0 },
-    resolution: { value: new THREE.Vector4() },
-    mRefractionRatio: { value: 1.02 },
-    mFresnelBias: { value: 0.1 },
-    mFresnelScale: { value: 2 },
-    mFresnelPower: { value: 1 },
+    time: {
+      value: 0
+    },
+    tCube: {
+      value: 0
+    },
+    resolution: {
+      value: new THREE.Vector4()
+    },
+    mRefractionRatio: {
+      value: 1.02
+    },
+    mFresnelBias: {
+      value: 0.1
+    },
+    mFresnelScale: {
+      value: 2
+    },
+    mFresnelPower: {
+      value: 1
+    },
   },
-  vertexShader: vertex1,
-  fragmentShader: fragment1,
+  vertexShader: littlesphereVertexShader,
+  fragmentShader: littlesphereFragmentShader,
 });
 
-const littleSphereGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+/**
+ * Debug
+ */
+const blobFresnel = gui.addFolder('Blob Fresnel');
+blobFresnel.close();
 
+gui
+blobFresnel.add(littleSphereMaterial.uniforms.mRefractionRatio, "value")
+  .min(0)
+  .max(1.2)
+  .step(0.01)
+  .name("mRefractionRatio")
+gui
+blobFresnel.add(littleSphereMaterial.uniforms.mFresnelBias, "value")
+  .min(0)
+  .max(1)
+  .step(0.01)
+  .name("mFresnelBias")
+gui
+blobFresnel.add(littleSphereMaterial.uniforms.mFresnelScale, "value")
+  .min(0)
+  .max(4)
+  .step(0.01)
+  .name("mFresnelScale")
+gui
+
+blobFresnel.add(littleSphereMaterial.uniforms.mFresnelPower, "value")
+  .min(0)
+  .max(5)
+  .step(0.01)
+  .name("mFresnelPower")
+
+// Mesh
 const littleSphereMesh = new THREE.Mesh(
   littleSphereGeometry,
   littleSphereMaterial
 );
-
 scene.add(littleSphereMesh);
 
 /**
@@ -185,13 +287,19 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.z = 1.3;
+camera.position.z = 1.1;
 scene.add(camera);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
+
 controls.enableDamping = true;
-controls.enableZoom = false;
+controls.dampingFactor = 0.05;
+
+controls.minDistance = 0.7;
+controls.maxDistance = 1.5;
+
+controls.enablePan = false;
 
 /**
  * Renderer
@@ -201,6 +309,17 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// Click & Drag to interact
+const instructionsElement = document.getElementById('instructions');
+
+renderer.domElement.addEventListener('click', () => {
+  instructionsElement.classList.add('fade-out');
+
+  instructionsElement.addEventListener('transitionend', () => {
+    instructionsElement.remove();
+  });
+});
 
 /**
  * Animate
@@ -218,15 +337,6 @@ const tick = () => {
   cubeCamera.update(renderer, scene);
   littleSphereMesh.visible = true;
   littleSphereMaterial.uniforms.tCube.value = cubeRenderTarget.texture;
-
-  // Update objects
-  //   sphere.rotation.y = 0.1 * elapsedTime;
-  //   plane.rotation.y = 0.1 * elapsedTime;
-  //   torus.rotation.y = 0.1 * elapsedTime;
-
-  //   sphere.rotation.x = -0.15 * elapsedTime;
-  //   plane.rotation.x = -0.15 * elapsedTime;
-  //   torus.rotation.x = -0.15 * elapsedTime;
 
   // Update controls
   controls.update();

@@ -1,6 +1,6 @@
 ## Shader Blob with Three.js
 
-<!-- Dans le cadre du module développement front en BUT MMI, j’ai dû réaliser un Audio Visualiser avec [Three.js](https://threejs.org/). Les musiques sont récupérés grâce à l'API de [Deezer].(https://developers.deezer.com/login?redirect=/api) J'ai ensuite été libre du choix du design et des objets 3D que je voulais rajouter. -->
+<!-- Shader blob with custom fresnel effect and noise shader pass. [Three.js](https://threejs.org/). Les musiques sont récupérés grâce à l'API de [Deezer].(https://developers.deezer.com/login?redirect=/api) J'ai ensuite été libre du choix du design et des objets 3D que je voulais rajouter. -->
 
 ## Links
 
